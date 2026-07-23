@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Login Tests" parallel="methods" thread-count="4">
+    <parameter name="OS" value="Windows"/>
+    <parameter name="OSVersion" value="11"/>
+    <parameter name="Device" value="PC"/>
+    <parameter name="Browser" value="Chrome"/>
+    <parameter name="BrowserVersion" value="latest"/>
+    <test name="Login Tests">
+        <classes>
+            <class name="com.portal.tests.ProfessionalPortalLoginTests"/>
+        </classes>
+    </test>
+</suite>
