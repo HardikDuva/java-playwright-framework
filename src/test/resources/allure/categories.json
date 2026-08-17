@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Product defects",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*AssertionError.*|.*expected.*but.*"
+  },
+  {
+    "name": "Timeouts / flaky",
+    "matchedStatuses": ["failed", "broken"],
+    "messageRegex": ".*TimeoutError.*|.*Timeout.*exceeded.*|.*waiting for.*"
+  },
+  {
+    "name": "Element / locator issues",
+    "matchedStatuses": ["broken", "failed"],
+    "messageRegex": ".*strict mode violation.*|.*no element.*|.*not visible.*|.*not attached.*"
+  },
+  {
+    "name": "Infrastructure / environment",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*Connection refused.*|.*net::ERR.*|.*Failed to launch.*|.*BrowserStack.*"
+  }
+]
