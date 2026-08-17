@@ -7,7 +7,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.portal.tests.api.LoginApiTests"/>
+            <class name="com.tests.api.LoginApiTests"/>
         </classes>
     </test>
 </suite>

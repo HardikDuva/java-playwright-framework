@@ -1,4 +1,4 @@
-package com.portal.tests.functional;
+package com.tests.smoke;
 
 import com.base.BaseTest;
 import com.config.ConfigReader;

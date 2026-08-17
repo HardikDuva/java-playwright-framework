@@ -3,6 +3,7 @@ package com.base;
 import com.capabilities.PCBrowserStackCapabilities;
 import com.config.ConfigReader;
 import com.driver.PlaywrightFactory;
+import com.listeners.AllureListener;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Page;

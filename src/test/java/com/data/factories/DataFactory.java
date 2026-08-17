@@ -1,5 +1,6 @@
-package com.data;
+package com.data.factories;
 
+import com.data.TestUser;
 import net.datafaker.Faker;
 
 import java.util.Locale;

@@ -12,7 +12,7 @@
             </run>
         </groups>
         <classes>
-            <class name="com.portal.tests.functional.LoginTests"/>
+            <class name="com.tests.smoke.LoginTests"/>
         </classes>
     </test>
 </suite>

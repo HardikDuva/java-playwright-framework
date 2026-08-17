@@ -15,7 +15,7 @@ import java.util.Map;
  * Thin wrapper over Playwright's {@link APIRequestContext} for REST calls.
  *
  * Two uses:
- *  1. Direct API tests (see com.portal.tests.api).
+ *  1. Direct API tests (see com.tests.api).
  *  2. Fast test setup/teardown for UI tests — e.g. obtain an auth token or
  *     seed data via API instead of clicking through the UI.
  *

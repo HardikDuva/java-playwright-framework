@@ -1,4 +1,4 @@
-package com.portal.tests.api;
+package com.tests.api;
 
 import com.api.ApiClient;
 import com.config.ConfigReader;

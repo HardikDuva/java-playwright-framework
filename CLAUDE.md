@@ -96,7 +96,7 @@ Listeners   → AllureEnvironmentListener writes environment.properties + catego
 | `BaseTest` | `com.base` | Test lifecycle; per-test context/page; trace/screenshot on failure; `getPage()`, `commonPages()`, `assertTrue()` |
 | `BasePage` | `com.base` | Playwright `Page` wrapper — `click`, `fill`, `getText`, `waitUntilLocatorVisible`, `isLocatorVisible`, `assertVisible` (web-first), `locator`, `waitForAllLoadersToDisappear`, `waitForURLToLoad`, `uploadFile`; SLF4J logging |
 | `PlaywrightFactory` | `com.driver` | Per-thread `Playwright`/`Browser` reuse (chromium/firefox/webkit); global `disposeAll()` |
-| `AllureListener` | `com.base` | `addTestStep`, `captureAndAttachScreenshot(Page)`, `attachFile(name, path, mime)` |
+| `AllureListener` | `com.listeners` | `addTestStep`, `captureAndAttachScreenshot(Page)`, `attachFile(name, path, mime)` |
 | `AllureEnvironmentListener` | `com.listeners` | `ISuiteListener` — writes `environment.properties` + copies `categories.json` (auto-registered) |
 | `StringValidator` | `com.base` | Static helpers: `isValidEmail`, `isValidPhone`, `isValidZipCode` |
 | `Pages` | `com.portal.pages` | Aggregator with typed accessors; `ConcurrentHashMap` + reflection for lazy instantiation |
@@ -104,7 +104,7 @@ Listeners   → AllureEnvironmentListener writes environment.properties + catego
 | `DashboardPage` | `com.portal.pages.admin` | `waitForAdminPortal()` |
 | `UserHomePage` | `com.portal.pages.user` | `waitForHomePage()` |
 | `ApiClient` | `com.api` | Playwright `APIRequestContext` wrapper — `get`/`post`, `loginAndGetToken`, JSON field extraction; `AutoCloseable` |
-| `DataFactory` | `com.data` | Datafaker-based unique users/emails/passwords (parallel-safe) → `TestUser` record |
+| `DataFactory` | `com.data.factories` | Datafaker-based unique users/emails/passwords (parallel-safe) → `TestUser` record |
 | `ConfigReader` | `com.config` | Layered config with precedence (see below); typed getters; thread-safe cache |
 | `UserRole` | `com.enums` | `ADMIN`, `USER` |
 | `PCBrowserStackCapabilities` | `com.capabilities` | Builds BrowserStack CDP WebSocket URL; Chrome, Edge, Safari |
@@ -150,7 +150,7 @@ Suite parameters (used by BrowserStack): `OS`, `OSVersion`, `Device`, `Browser`,
 
 ## Writing New Tests
 
-1. Create a test class in `com.portal.tests`, extend `BaseTest`.
+1. Create a test class in `com.tests.<group>` (e.g. `com.tests.smoke`, `com.tests.regression`, `com.tests.api`), extend `BaseTest`.
 2. Tag it: `@Test(groups = {"smoke", "regression"})` (add Allure `@Epic`/`@Feature`/`@Severity` as useful).
 3. Access pages via `commonPages().<page>().<action>()`.
 4. Assert with `assertTrue(condition, message)` — captures a screenshot on failure.
