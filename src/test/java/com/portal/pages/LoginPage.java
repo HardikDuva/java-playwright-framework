@@ -31,8 +31,8 @@ public class LoginPage extends BasePage {
 
     public void loginWithCredentials(String email, String password) {
         logInfo("Logging in with email: " + email);
-        page.locator(EMAIL_INPUT).fill(email);
-        page.locator(PASSWORD_INPUT).fill(password);
+        locator(EMAIL_INPUT).fill(email);
+        locator(PASSWORD_INPUT).fill(password);
         click(SIGN_IN_BUTTON);
     }
 

@@ -18,6 +18,14 @@
         <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
         <maven.surefire.plugin.version>3.5.6</maven.surefire.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Overridable at runtime, e.g. -DthreadCount=4 -DtestFailureIgnore=false -->
+        <threadCount>4</threadCount>
+        <!-- Keep the build red when tests fail. Only CI convenience jobs may flip this to true. -->
+        <testFailureIgnore>false</testFailureIgnore>
+
+        <logback.version>1.5.18</logback.version>
+        <datafaker.version>2.4.4</datafaker.version>
     </properties>
 
     <dependencies>
@@ -44,11 +52,19 @@
             <version>2.35.3</version>
         </dependency>
 
-        <!-- Logging -->
+        <!-- Logging: SLF4J API + Logback backend (structured, per-thread MDC) -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.17</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- Deterministic, realistic test-data generation -->
+        <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>${datafaker.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- JSON serialisation for BrowserStack capability building -->
@@ -90,12 +106,32 @@
                         <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
                     </suiteXmlFiles>
                     <useModulePath>false</useModulePath>
-                    <testFailureIgnore>true</testFailureIgnore>
+                    <!-- Quality gate: false by default so a failed test fails the build/CI. -->
+                    <testFailureIgnore>${testFailureIgnore}</testFailureIgnore>
+                    <trimStackTrace>false</trimStackTrace>
                     <reuseForks>true</reuseForks>
                     <forkCount>1</forkCount>
+                    <properties>
+                        <property>
+                            <name>dataproviderthreadcount</name>
+                            <value>${threadCount}</value>
+                        </property>
+                    </properties>
                     <systemPropertyVariables>
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                        <threadCount>${threadCount}</threadCount>
                     </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <!-- Playwright browser install via: mvn exec:java -Dexec.args="install with-deps chromium" -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <mainClass>com.microsoft.playwright.CLI</mainClass>
+                    <classpathScope>test</classpathScope>
                 </configuration>
             </plugin>
 

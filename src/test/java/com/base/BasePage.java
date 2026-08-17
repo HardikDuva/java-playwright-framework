@@ -5,17 +5,21 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.TimeoutError;
-import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.microsoft.playwright.options.WaitUntilState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
 public class BasePage {
 
     protected final Page page;
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private static final int NAVIGATION_TIMEOUT_MS = ConfigReader.getNavigationTimeout();
     private static final int VISIBILITY_TIMEOUT_MS = ConfigReader.getVisibilityTimeout();
@@ -40,41 +44,48 @@ public class BasePage {
         }
     }
 
+    // --- Logging ------------------------------------------------------------
+
     public void logInfo(String message) {
         AllureListener.addTestStep(message);
-        System.out.println(message);
+        log.info(message);
     }
 
     public void logFail(String message, String... extra) {
         String fullMessage = extra.length > 0 ? message + extra[0] : message;
         AllureListener.addTestStep(fullMessage);
-        System.err.println(fullMessage);
+        log.error(fullMessage);
         AllureListener.captureAndAttachScreenshot(this.page);
         Assert.fail(fullMessage);
     }
+
+    // --- Locator helpers ----------------------------------------------------
+
+    protected Locator locator(String selector) {
+        return page.locator(selector);
+    }
+
+    // --- Actions ------------------------------------------------------------
 
     public void navigate(String url) {
         page.navigate(url, NAVIGATE_OPTIONS);
     }
 
     public void click(String selector) {
-        if (page == null || page.isClosed()) {
+        if (isPageUnusable()) {
             logFail("Click failed — page is null or closed. Selector: '" + selector + "'");
             return;
         }
         try {
-            page.waitForSelector(selector, VISIBLE_SELECTOR_OPTIONS);
+            // Playwright auto-waits for the element to be visible, enabled and stable.
             page.locator(selector).click();
-            page.waitForLoadState(LoadState.DOMCONTENTLOADED);
-        } catch (TimeoutError ignored) {
-            // no navigation triggered — DOM already ready
         } catch (PlaywrightException e) {
             logFail("Click failed on selector '" + selector + "'", " — " + e.getMessage());
         }
     }
 
     public void fill(String selector, String value) {
-        if (page == null || page.isClosed()) {
+        if (isPageUnusable()) {
             logFail("Fill failed — page is null or closed. Selector: '" + selector + "'");
             return;
         }
@@ -91,7 +102,7 @@ public class BasePage {
     }
 
     public String getText(String selector) {
-        if (page == null || page.isClosed()) {
+        if (isPageUnusable()) {
             logFail("getText failed — page is null or closed. Selector: '" + selector + "'");
             return null;
         }
@@ -103,8 +114,10 @@ public class BasePage {
         }
     }
 
+    // --- Waits & assertions -------------------------------------------------
+
     public void waitUntilLocatorVisible(String selector) {
-        if (page == null || page.isClosed()) {
+        if (isPageUnusable()) {
             logFail("waitUntilLocatorVisible failed — page is null or closed. Selector: '" + selector + "'");
             return;
         }
@@ -116,12 +129,26 @@ public class BasePage {
         }
     }
 
+    /**
+     * Web-first assertion: retries until the element is visible or the timeout
+     * elapses, then fails the test with a rich message. Prefer this over
+     * {@link #isLocatorVisible} when visibility is the thing under test.
+     */
+    public void assertVisible(String selector) {
+        assertThat(page.locator(selector)).isVisible();
+    }
+
+    /**
+     * Non-throwing visibility probe. Returns false if the element does not
+     * become visible within the configured timeout. Use for branching, not
+     * for the primary assertion of a test.
+     */
     public boolean isLocatorVisible(String selector) {
-        if (page == null || page.isClosed()) return false;
+        if (isPageUnusable()) return false;
         try {
             page.waitForSelector(selector, VISIBLE_SELECTOR_OPTIONS);
             return true;
-        } catch (Exception e) {
+        } catch (TimeoutError e) {
             return false;
         }
     }
@@ -168,7 +195,7 @@ public class BasePage {
     }
 
     public void waitForURLToLoad(String urlPattern) {
-        if (page == null || page.isClosed()) {
+        if (isPageUnusable()) {
             logFail("waitForURLToLoad failed — page is null or closed. Pattern: '" + urlPattern + "'");
             return;
         }
@@ -181,7 +208,7 @@ public class BasePage {
     }
 
     public void uploadFile(String selector, String fileName) {
-        if (page == null || page.isClosed()) {
+        if (isPageUnusable()) {
             logFail("uploadFile failed — page is null or closed. File: '" + fileName + "'");
             return;
         }
@@ -191,5 +218,9 @@ public class BasePage {
         } catch (Exception e) {
             logFail("File upload failed for '" + fileName + "' on selector '" + selector + "'", ": " + e.getMessage());
         }
+    }
+
+    private boolean isPageUnusable() {
+        return page == null || page.isClosed();
     }
 }
