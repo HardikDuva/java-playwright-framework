@@ -1,4 +1,4 @@
-package com.portal.tests;
+package com.portal.tests.functional;
 
 import com.base.BaseTest;
 import com.config.ConfigReader;

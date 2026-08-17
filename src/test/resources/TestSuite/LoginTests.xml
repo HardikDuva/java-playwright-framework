@@ -7,7 +7,7 @@
     <parameter name="BrowserVersion" value="latest"/>
     <test name="Login Tests">
         <classes>
-            <class name="com.portal.tests.LoginTests"/>
+            <class name="com.portal.tests.functional.LoginTests"/>
         </classes>
     </test>
 </suite>
