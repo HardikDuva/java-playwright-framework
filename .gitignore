@@ -1,0 +1,28 @@
+# Build
+target/
+*.class
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Reports / artifacts
+allure-results/
+allure-report/
+.allure/
+target/traces/
+target/videos/
+target/logs/
+*.log
+
+# Local secrets / overrides (never commit)
+config-local.properties
+src/test/resources/config/config-local.properties
+.env
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,60 @@
+name: CI (smoke gate)
+
+# PR quality gate: smoke suite must pass before merge.
+on:
+  pull_request:
+    branches: [ master ]
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Public demo creds; override with real secrets in a private fork.
+      ADMIN_LOGIN_PASSWORD: ${{ secrets.ADMIN_LOGIN_PASSWORD || 'welcome01' }}
+      USER_LOGIN_PASSWORD:  ${{ secrets.USER_LOGIN_PASSWORD || 'welcome01' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Compile
+        run: mvn -B clean test-compile
+
+      - name: Install Playwright browsers
+        run: mvn -B exec:java -Dexec.args="install --with-deps chromium"
+
+      - name: Run smoke suite
+        run: >
+          mvn -B test
+          -DsuiteXmlFile=src/test/resources/suites/smoke.xml
+          -Dbrowser.headless=true
+          -DtestFailureIgnore=false
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-smoke
+          path: target/allure-results
+          retention-days: 7
+
+      - name: Upload traces (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: target/traces
+          retention-days: 7
