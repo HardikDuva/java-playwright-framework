@@ -56,7 +56,7 @@ src/test/java/com/
     │   └── user/
     │       └── UserHomePage.java     # User account page wait
     └── tests/
-        └── ProfessionalPortalLoginTests.java   # 9 login test scenarios (all enabled)
+        └── LoginTests.java   # 9 login test scenarios (all enabled)
 
 src/test/resources/
 ├── config/
